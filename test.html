@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebXR 支持检测</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            text-align: left;
+        }
+        .supported {
+            color: green;
+            font-weight: bold;
+        }
+        .unsupported {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebXR 支持检测</h1>
+    <p>点击按钮检测您的浏览器和设备是否支持 WebXR（VR/AR）：</p>
+    <button onclick="checkWebXRSupport()">检测 WebXR 支持</button>
+    <div id="result"></div>
+
+    <script>
+        async function checkWebXRSupport() {
+            const resultElement = document.getElementById('result');
+            resultElement.innerHTML = '<p>检测中...</p>';
+
+            if (!navigator.xr) {
+                resultElement.innerHTML = '<p class="unsupported">❌ 您的浏览器不支持 WebXR API。</p>';
+                return false;
+            }
+
+            try {
+                // 检测 VR 支持
+                const vrSupported = await navigator.xr.isSessionSupported('immersive-vr');
+                // 检测 AR 支持
+                const arSupported = await navigator.xr.isSessionSupported('immersive-ar');
+
+                let resultHTML = `
+                    <p><strong>VR 支持：</strong> <span class="${vrSupported ? 'supported' : 'unsupported'}">${vrSupported ? '✅ 是' : '❌ 否'}</span></p>
+                    <p><strong>AR 支持：</strong> <span class="${arSupported ? 'supported' : 'unsupported'}">${arSupported ? '✅ 是' : '❌ 否'}</span></p>
+                `;
+
+                if (vrSupported || arSupported) {
+                    resultHTML += '<p class="supported">🎉 您的设备支持 WebXR！</p>';
+                } else {
+                    resultHTML += '<p class="unsupported">❌ 您的设备不支持 WebXR VR 或 AR。</p>';
+                }
+
+                resultElement.innerHTML = resultHTML;
+                return vrSupported || arSupported;
+            } catch (error) {
+                resultElement.innerHTML = `<p class="unsupported">⚠️ 检测出错：${error.message}</p>`;
+                return false;
+            }
+        }
+    </script>
+</body>
+</html>
